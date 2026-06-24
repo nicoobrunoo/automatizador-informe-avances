@@ -1,112 +1,191 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Automatizador Informe de Avances</title>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js"></script>
 
 <style>
+:root{
+  --blue:#2563eb;
+  --blue-dark:#1e40af;
+  --dark:#0f172a;
+  --muted:#64748b;
+  --bg:#eef3fb;
+  --card:#ffffff;
+  --green:#15803d;
+  --red:#dc2626;
+  --border:#e5e7eb;
+}
+
 *{box-sizing:border-box}
 
 body{
   margin:0;
   font-family:Calibri,Arial,sans-serif;
-  background:linear-gradient(135deg,#e8f0ff,#f8fafc);
+  background:
+    radial-gradient(circle at top left,#dbeafe 0,#eef3fb 32%,#f8fafc 100%);
   color:#111827;
 }
 
-.wrapper{
-  max-width:1150px;
-  margin:35px auto;
-  padding:25px;
+.app{
+  max-width:1200px;
+  margin:0 auto;
+  padding:28px;
 }
 
 .hero{
   background:linear-gradient(135deg,#1d4ed8,#0f172a);
   color:white;
+  border-radius:30px;
   padding:34px;
-  border-radius:26px;
-  box-shadow:0 20px 45px rgba(15,23,42,.22);
-  margin-bottom:24px;
+  box-shadow:0 24px 55px rgba(15,23,42,.25);
+  position:relative;
+  overflow:hidden;
+}
+
+.hero:after{
+  content:"";
+  position:absolute;
+  width:260px;
+  height:260px;
+  border-radius:50%;
+  background:rgba(255,255,255,.08);
+  right:-80px;
+  top:-80px;
 }
 
 .hero h1{
   margin:0;
-  font-size:34px;
+  font-size:36px;
+  letter-spacing:.2px;
 }
 
 .hero p{
-  margin:10px 0 0;
-  opacity:.9;
+  margin:12px 0 0;
+  max-width:780px;
   font-size:17px;
+  opacity:.9;
+}
+
+.badges{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-top:18px;
+}
+
+.badge{
+  background:rgba(255,255,255,.14);
+  border:1px solid rgba(255,255,255,.22);
+  padding:8px 12px;
+  border-radius:999px;
+  font-weight:700;
+  font-size:14px;
+}
+
+.layout{
+  display:grid;
+  grid-template-columns:1.05fr .95fr;
+  gap:22px;
+  margin-top:24px;
+}
+
+@media(max-width:950px){
+  .layout{grid-template-columns:1fr}
 }
 
 .card{
-  background:white;
-  border-radius:24px;
-  padding:26px;
-  box-shadow:0 18px 40px rgba(15,23,42,.08);
-  margin-bottom:22px;
-  border:1px solid #e5e7eb;
+  background:rgba(255,255,255,.88);
+  backdrop-filter:blur(10px);
+  border:1px solid var(--border);
+  border-radius:26px;
+  padding:24px;
+  box-shadow:0 18px 45px rgba(15,23,42,.08);
 }
 
-.grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:20px;
+.card h2{
+  margin:0 0 14px;
+  font-size:22px;
 }
 
-@media(max-width:850px){
-  .grid{grid-template-columns:1fr}
+.step{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  margin-bottom:16px;
 }
 
-.drop-zone{
-  border:2px dashed #2563eb;
-  border-radius:22px;
-  padding:42px;
-  text-align:center;
-  background:#eff6ff;
-  cursor:pointer;
-  transition:.25s;
-}
-
-.drop-zone:hover,
-.drop-zone.dragover{
+.step-number{
+  width:34px;
+  height:34px;
   background:#dbeafe;
+  color:#1e40af;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:800;
+}
+
+.drop{
+  border:2px dashed var(--blue);
+  background:#eff6ff;
+  border-radius:22px;
+  padding:38px 24px;
+  text-align:center;
+  cursor:pointer;
+  transition:.25s ease;
+}
+
+.drop:hover,.drop.dragover{
   transform:translateY(-2px);
+  background:#dbeafe;
+  box-shadow:0 10px 25px rgba(37,99,235,.13);
 }
 
-.drop-zone h2{
-  margin:0 0 8px;
-  color:#1e3a8a;
+.drop .icon{
+  font-size:46px;
+  margin-bottom:8px;
 }
 
-.drop-zone p{
+.drop h3{
   margin:0;
+  color:#1e3a8a;
+  font-size:21px;
+}
+
+.drop p{
+  margin:8px 0 0;
   color:#475569;
 }
 
-input[type=file]{
-  display:none;
-}
+input[type=file]{display:none}
 
 label{
   display:block;
-  font-weight:bold;
-  margin-bottom:8px;
-  color:#374151;
+  font-weight:800;
+  margin:14px 0 8px;
+  color:#334155;
 }
 
 select,input[type=number]{
   width:100%;
-  padding:13px;
-  border-radius:12px;
-  border:1px solid #d1d5db;
+  border:1px solid #cbd5e1;
+  border-radius:14px;
+  padding:13px 14px;
   font-size:16px;
   font-family:Calibri,Arial,sans-serif;
   background:white;
+}
+
+.controls{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:16px;
 }
 
 .actions{
@@ -118,205 +197,281 @@ select,input[type=number]{
 
 button{
   border:none;
-  padding:13px 20px;
-  border-radius:13px;
-  font-weight:bold;
+  border-radius:14px;
+  padding:13px 18px;
   cursor:pointer;
+  font-weight:800;
   font-size:15px;
   transition:.2s;
+  font-family:Calibri,Arial,sans-serif;
 }
 
-.btn-primary{
-  background:#2563eb;
-  color:white;
-}
-
-.btn-primary:hover{
-  background:#1d4ed8;
-  transform:translateY(-1px);
-}
-
-.btn-dark{
-  background:#111827;
-  color:white;
-}
-
-.btn-dark:hover{
-  background:#020617;
+button:hover:not(:disabled){
   transform:translateY(-1px);
 }
 
 button:disabled{
   opacity:.45;
   cursor:not-allowed;
-  transform:none!important;
 }
 
+.btn-primary{background:var(--blue);color:white}
+.btn-primary:hover:not(:disabled){background:var(--blue-dark)}
+.btn-dark{background:var(--dark);color:white}
+.btn-soft{background:#e2e8f0;color:#0f172a}
+.btn-red{background:#fee2e2;color:#991b1b}
+
 .status{
-  margin-top:15px;
-  font-weight:bold;
-  color:#166534;
+  margin-top:14px;
+  font-weight:800;
+  color:var(--green);
+}
+
+.progress-wrap{
+  display:none;
+  margin-top:16px;
+  background:#e5e7eb;
+  height:11px;
+  border-radius:999px;
+  overflow:hidden;
+}
+
+.progress{
+  height:100%;
+  width:0%;
+  background:linear-gradient(90deg,#2563eb,#22c55e);
+  transition:.25s;
 }
 
 .stats{
   display:grid;
   grid-template-columns:repeat(4,1fr);
-  gap:14px;
-  margin-top:20px;
+  gap:12px;
+  margin-top:16px;
 }
 
-@media(max-width:850px){
+@media(max-width:700px){
   .stats{grid-template-columns:1fr 1fr}
+  .controls{grid-template-columns:1fr}
 }
 
 .stat{
   background:#f8fafc;
-  border:1px solid #e5e7eb;
-  padding:16px;
-  border-radius:16px;
+  border:1px solid var(--border);
+  padding:15px;
+  border-radius:18px;
+}
+
+.stat span{
+  color:var(--muted);
+  font-weight:800;
+  font-size:13px;
 }
 
 .stat strong{
   display:block;
-  font-size:26px;
-  margin-top:5px;
+  margin-top:4px;
+  font-size:27px;
+}
+
+.filename{
+  margin-top:12px;
+  background:#f8fafc;
+  padding:12px 14px;
+  border-radius:14px;
+  border:1px solid var(--border);
+  font-weight:800;
+  color:#334155;
 }
 
 textarea{
   width:100%;
-  min-height:260px;
+  min-height:255px;
   margin-top:18px;
-  padding:18px;
+  border:1px solid #cbd5e1;
+  border-radius:18px;
+  padding:16px;
+  resize:vertical;
   font-family:Calibri,Arial,sans-serif;
   font-size:11pt;
-  border-radius:16px;
-  border:1px solid #d1d5db;
-  resize:vertical;
+  background:#fff;
 }
 
-.preview-list{
-  font-size:11pt;
-  line-height:1.6;
+.preview{
+  max-height:340px;
+  overflow:auto;
   margin-top:18px;
+  padding-right:8px;
 }
 
-.preview-list li{
-  margin-bottom:7px;
+.preview ol{
+  margin-top:0;
+  font-size:11pt;
+  line-height:1.55;
+}
+
+.preview li{
+  margin-bottom:8px;
 }
 
 .duplicates{
   display:none;
-  margin-top:24px;
+  margin-top:20px;
   background:#fef2f2;
   border:1px solid #fca5a5;
-  border-radius:18px;
-  padding:22px;
+  border-radius:20px;
+  padding:20px;
 }
 
 .duplicates h3{
-  color:#dc2626;
-  margin-top:0;
+  margin:0 0 12px;
+  color:var(--red);
 }
 
 .duplicates li{
   color:#991b1b;
-  margin-bottom:9px;
+  margin-bottom:8px;
 }
 
-.badge{
-  display:inline-block;
-  padding:6px 10px;
-  border-radius:999px;
-  background:#dbeafe;
-  color:#1e3a8a;
-  font-weight:bold;
-  margin-top:12px;
+.note{
+  margin-top:14px;
+  padding:14px;
+  border-radius:16px;
+  background:#f0f9ff;
+  border:1px solid #bae6fd;
+  color:#075985;
+  font-weight:700;
 }
 
-.small{
+.footer{
+  text-align:center;
   color:#64748b;
-  font-size:14px;
+  margin:24px 0 5px;
+  font-weight:700;
 }
+
+.hidden{display:none!important}
 </style>
 </head>
 
 <body>
-
-<div class="wrapper">
+<div class="app">
 
   <section class="hero">
     <h1>Automatizador de Informe de Avances</h1>
-    <p>Procesá PDF de Redmine, eliminá duplicados y generá el informe Word final en Calibri 11.</p>
-    <span class="badge">Herramienta interna · Sistemas y Tecnología</span>
-  </section>
-
-  <section class="card">
-    <div class="grid">
-      <div>
-        <div class="drop-zone" id="dropZone">
-          <h2>Arrastrá acá los PDF de Redmine</h2>
-          <p>o hacé click para seleccionarlos</p>
-          <input type="file" id="pdfInput" accept="application/pdf" multiple>
-        </div>
-
-        <div class="actions">
-          <button class="btn-primary" onclick="procesarPDFs()">Procesar PDF</button>
-          <button class="btn-dark" id="btnDescargar" onclick="descargarInforme()" disabled>
-            Descargar Informe Word
-          </button>
-        </div>
-
-        <div class="status" id="status"></div>
-      </div>
-
-      <div>
-        <label>Mes del informe</label>
-        <select id="mesInforme">
-          <option value="enero">Enero</option>
-          <option value="febrero">Febrero</option>
-          <option value="marzo">Marzo</option>
-          <option value="abril">Abril</option>
-          <option value="mayo">Mayo</option>
-          <option value="junio">Junio</option>
-          <option value="julio">Julio</option>
-          <option value="agosto">Agosto</option>
-          <option value="septiembre">Septiembre</option>
-          <option value="octubre">Octubre</option>
-          <option value="noviembre">Noviembre</option>
-          <option value="diciembre">Diciembre</option>
-        </select>
-
-        <br><br>
-
-        <label>Año del informe</label>
-        <input type="number" id="anioInforme" value="2026">
-
-        <p class="small">
-          El archivo se descargará como: <b>Informe de Avances Mes Año.docx</b>
-        </p>
-      </div>
+    <p>
+      Herramienta para generar el informe mensual a partir de los PDF exportados desde Redmine.
+      Extrae la columna Asunto, corrige textos, elimina repetidos y arma el Word final en Calibri 11.
+    </p>
+    <div class="badges">
+      <div class="badge">PDF Redmine</div>
+      <div class="badge">Calibri 11</div>
+      <div class="badge">Informe Word automático</div>
+      <div class="badge">Duplicados controlados</div>
     </div>
   </section>
 
-  <section class="card">
-    <h2>Resultado del procesamiento</h2>
+  <div class="layout">
 
-    <div class="stats">
-      <div class="stat">PDF cargados<strong id="statPDF">0</strong></div>
-      <div class="stat">Asuntos encontrados<strong id="statTotal">0</strong></div>
-      <div class="stat">Asuntos únicos<strong id="statUnicos">0</strong></div>
-      <div class="stat">Repetidos eliminados<strong id="statDuplicados">0</strong></div>
+    <section class="card">
+      <div class="step">
+        <div class="step-number">1</div>
+        <h2>Cargar archivos Redmine</h2>
+      </div>
+
+      <div class="drop" id="dropZone">
+        <div class="icon">📄</div>
+        <h3>Arrastrá acá los PDF</h3>
+        <p>o hacé click para seleccionarlos desde Descargas</p>
+        <input type="file" id="pdfInput" accept="application/pdf" multiple>
+      </div>
+
+      <div class="progress-wrap" id="progressWrap">
+        <div class="progress" id="progressBar"></div>
+      </div>
+
+      <div class="actions">
+        <button class="btn-primary" onclick="procesarPDFs()">Procesar PDF</button>
+        <button class="btn-dark" id="btnDescargar" onclick="descargarInforme()" disabled>
+          Descargar informe Word
+        </button>
+        <button class="btn-soft" onclick="copiarResultado()">Copiar asuntos</button>
+        <button class="btn-red" onclick="reiniciar()">Reiniciar</button>
+      </div>
+
+      <div class="status" id="status">Esperando archivos PDF.</div>
+
+      <div class="note">
+        El botón de descarga se habilita únicamente después de procesar correctamente los asuntos.
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="step">
+        <div class="step-number">2</div>
+        <h2>Datos del informe</h2>
+      </div>
+
+      <div class="controls">
+        <div>
+          <label>Mes del informe</label>
+          <select id="mesInforme" onchange="actualizarNombreArchivo()">
+            <option value="enero">Enero</option>
+            <option value="febrero">Febrero</option>
+            <option value="marzo">Marzo</option>
+            <option value="abril">Abril</option>
+            <option value="mayo">Mayo</option>
+            <option value="junio">Junio</option>
+            <option value="julio">Julio</option>
+            <option value="agosto">Agosto</option>
+            <option value="septiembre">Septiembre</option>
+            <option value="octubre">Octubre</option>
+            <option value="noviembre">Noviembre</option>
+            <option value="diciembre">Diciembre</option>
+          </select>
+        </div>
+
+        <div>
+          <label>Año</label>
+          <input type="number" id="anioInforme" value="2026" onchange="actualizarNombreArchivo()" onkeyup="actualizarNombreArchivo()">
+        </div>
+      </div>
+
+      <div class="filename" id="nombreArchivo">
+        Informe de Avances Abril 2026.docx
+      </div>
+
+      <div class="stats">
+        <div class="stat"><span>PDF cargados</span><strong id="statPDF">0</strong></div>
+        <div class="stat"><span>Asuntos encontrados</span><strong id="statTotal">0</strong></div>
+        <div class="stat"><span>Asuntos únicos</span><strong id="statUnicos">0</strong></div>
+        <div class="stat"><span>Repetidos eliminados</span><strong id="statDuplicados">0</strong></div>
+      </div>
+    </section>
+
+  </div>
+
+  <section class="card">
+    <div class="step">
+      <div class="step-number">3</div>
+      <h2>Vista previa de asuntos incorporados</h2>
     </div>
 
-    <textarea id="resultado" placeholder="Acá aparecerán los asuntos procesados..."></textarea>
+    <textarea id="resultado" placeholder="Cuando proceses los PDF, acá aparecerán los asuntos listos para incorporarse al informe."></textarea>
 
-    <ol class="preview-list" id="lista"></ol>
+    <div class="preview">
+      <ol id="lista"></ol>
+    </div>
 
     <div class="duplicates" id="duplicadosContainer">
       <h3>🔴 Asuntos eliminados por repetidos</h3>
       <ul id="listaDuplicados"></ul>
     </div>
   </section>
+
+  <div class="footer">
+    Desarrollado para automatizar informes internos de Sistemas y Tecnología.
+  </div>
 
 </div>
 
@@ -328,18 +483,22 @@ const input = document.getElementById("pdfInput");
 const dropZone = document.getElementById("dropZone");
 const statusBox = document.getElementById("status");
 const btnDescargar = document.getElementById("btnDescargar");
+const progressWrap = document.getElementById("progressWrap");
+const progressBar = document.getElementById("progressBar");
 
 let archivosSeleccionados = [];
 let asuntosFinales = [];
 let asuntosDuplicados = [];
 let totalProcesados = 0;
 
+inicializarMesActual();
+actualizarNombreArchivo();
+
 dropZone.addEventListener("click", () => input.click());
 
 input.addEventListener("change", () => {
   archivosSeleccionados = Array.from(input.files);
-  statusBox.textContent = `${archivosSeleccionados.length} archivo(s) seleccionado(s).`;
-  document.getElementById("statPDF").textContent = archivosSeleccionados.length;
+  actualizarArchivosSeleccionados();
 });
 
 dropZone.addEventListener("dragover", e => {
@@ -358,9 +517,33 @@ dropZone.addEventListener("drop", e => {
   archivosSeleccionados = Array.from(e.dataTransfer.files)
     .filter(file => file.type === "application/pdf");
 
-  statusBox.textContent = `${archivosSeleccionados.length} archivo(s) seleccionado(s).`;
-  document.getElementById("statPDF").textContent = archivosSeleccionados.length;
+  actualizarArchivosSeleccionados();
 });
+
+function actualizarArchivosSeleccionados(){
+  document.getElementById("statPDF").textContent = archivosSeleccionados.length;
+  statusBox.textContent = archivosSeleccionados.length
+    ? `${archivosSeleccionados.length} archivo(s) PDF seleccionado(s).`
+    : "Esperando archivos PDF.";
+  btnDescargar.disabled = true;
+}
+
+function inicializarMesActual(){
+  const meses = [
+    "enero","febrero","marzo","abril","mayo","junio",
+    "julio","agosto","septiembre","octubre","noviembre","diciembre"
+  ];
+  const hoy = new Date();
+  document.getElementById("mesInforme").value = meses[hoy.getMonth()];
+  document.getElementById("anioInforme").value = hoy.getFullYear();
+}
+
+function actualizarNombreArchivo(){
+  const mes = document.getElementById("mesInforme").value;
+  const anio = document.getElementById("anioInforme").value || "2026";
+  document.getElementById("nombreArchivo").textContent =
+    `Informe de Avances ${capitalizar(mes)} ${anio}.docx`;
+}
 
 async function procesarPDFs(){
   if(archivosSeleccionados.length === 0){
@@ -368,8 +551,10 @@ async function procesarPDFs(){
     return;
   }
 
+  bloquearProcesamiento(true);
   statusBox.textContent = "Procesando PDF...";
-  btnDescargar.disabled = true;
+  progressWrap.style.display = "block";
+  progressBar.style.width = "0%";
 
   asuntosFinales = [];
   asuntosDuplicados = [];
@@ -377,9 +562,15 @@ async function procesarPDFs(){
 
   let todosLosAsuntos = [];
 
-  for(const file of archivosSeleccionados){
+  for(let i = 0; i < archivosSeleccionados.length; i++){
+    const file = archivosSeleccionados[i];
+    statusBox.textContent = `Procesando ${file.name}...`;
+
     const asuntos = await extraerAsuntosDesdePDF(file);
     todosLosAsuntos.push(...asuntos);
+
+    const porcentaje = Math.round(((i + 1) / archivosSeleccionados.length) * 100);
+    progressBar.style.width = porcentaje + "%";
   }
 
   totalProcesados = todosLosAsuntos.length;
@@ -389,8 +580,16 @@ async function procesarPDFs(){
   mostrarDuplicados();
   actualizarStats();
 
-  statusBox.textContent = "PDF procesado correctamente. Ya podés descargar el informe.";
-  btnDescargar.disabled = false;
+  statusBox.textContent = "PDF procesado correctamente. Informe listo para descargar.";
+  btnDescargar.disabled = asuntosFinales.length === 0;
+  bloquearProcesamiento(false);
+}
+
+function bloquearProcesamiento(bloqueado){
+  const botones = document.querySelectorAll("button");
+  botones.forEach(btn => {
+    if(btn.id !== "btnDescargar") btn.disabled = bloqueado;
+  });
 }
 
 async function extraerAsuntosDesdePDF(file){
@@ -447,8 +646,8 @@ async function extraerAsuntosDesdePDF(file){
 }
 
 function detectarColumnas(items){
-  const asunto = items.find(i => i.text.toLowerCase() === "asunto");
-  const estado = items.find(i => i.text.toLowerCase() === "estado");
+  const asunto = items.find(i => normalizar(i.text) === "asunto");
+  const estado = items.find(i => normalizar(i.text) === "estado");
 
   if(!asunto || !estado) return null;
 
@@ -465,7 +664,10 @@ function esAsuntoValido(texto){
   if(/^\d{1,2}\/\d{1,2}/.test(t)) return false;
   if(/^\d{1,2}:\d{2}/.test(t)) return false;
 
-  const invalidos = ["finalizada","verificar","normal","alta","urgente"];
+  const invalidos = [
+    "finalizada","verificar","normal","alta","urgente",
+    "autor","asignado","actualizado"
+  ];
 
   return !invalidos.includes(t);
 }
@@ -478,20 +680,31 @@ function corregirTexto(texto){
     .trim()
     .toLowerCase();
 
-  texto = texto
-    .replaceAll("recaudacion","recaudación")
-    .replaceAll("generacion","generación")
-    .replaceAll("modificacion","modificación")
-    .replaceAll("modulo","módulo")
-    .replaceAll("vinculo","vínculo")
-    .replaceAll("envio","envío")
-    .replaceAll("debitos","débitos")
-    .replaceAll("automaticos","automáticos")
-    .replaceAll("electronicos","electrónicos")
-    .replaceAll("area","área")
-    .replaceAll("litsado","listado")
-    .replaceAll("slicito","solicito")
-    .replaceAll("remitar","remitir");
+  const reemplazos = {
+    "recaudacion":"recaudación",
+    "generacion":"generación",
+    "modificacion":"modificación",
+    "modulo":"módulo",
+    "vinculo":"vínculo",
+    "envio":"envío",
+    "debitos":"débitos",
+    "automaticos":"automáticos",
+    "electronicos":"electrónicos",
+    "area":"área",
+    "litsado":"listado",
+    "slicito":"solicito",
+    "remitar":"remitir",
+    "emision":"emisión",
+    "anulacion":"anulación",
+    "adhesion":"adhesión",
+    "direccion":"dirección",
+    "tesoreria":"tesorería",
+    "rectificativa":"rectificativa"
+  };
+
+  Object.keys(reemplazos).forEach(k => {
+    texto = texto.replaceAll(k,reemplazos[k]);
+  });
 
   texto = texto.charAt(0).toUpperCase() + texto.slice(1);
 
@@ -502,13 +715,17 @@ function corregirTexto(texto){
     .replaceAll("pdf","PDF")
     .replaceAll("gd","GD")
     .replaceAll("gdd","GDD")
+    .replaceAll("amip","AMIP")
+    .replaceAll("web amip","WEB AMIP")
+    .replaceAll("kontaktar","Kontaktar")
     .replaceAll("back intermedio","Back Intermedio")
     .replaceAll("tribunal de cuentas","Tribunal de Cuentas")
     .replaceAll("tasas varias","Tasas Varias")
     .replaceAll("fondo para la defensa civil","Fondo para la Defensa Civil")
     .replaceAll("licencia de conducir","Licencia de Conducir")
     .replaceAll("recaudación","Recaudación")
-    .replaceAll("kontaktar","Kontaktar");
+    .replaceAll("gestión de deuda","Gestión de Deuda")
+    .replaceAll("redmine","Redmine");
 
   if(!texto.endsWith(".")) texto += ".";
 
@@ -523,7 +740,7 @@ function eliminarDuplicados(items){
   asuntosDuplicados = [];
 
   items.forEach(item => {
-    const clave = item.toLowerCase().trim();
+    const clave = normalizar(item);
 
     contador[clave] = (contador[clave] || 0) + 1;
 
@@ -589,6 +806,52 @@ function actualizarStats(){
   document.getElementById("statDuplicados").textContent = totalProcesados - asuntosFinales.length;
 }
 
+function copiarResultado(){
+  const resultado = document.getElementById("resultado");
+
+  if(!resultado.value.trim()){
+    alert("No hay asuntos para copiar.");
+    return;
+  }
+
+  navigator.clipboard.writeText(resultado.value);
+  statusBox.textContent = "Asuntos copiados al portapapeles.";
+}
+
+function reiniciar(){
+  archivosSeleccionados = [];
+  asuntosFinales = [];
+  asuntosDuplicados = [];
+  totalProcesados = 0;
+
+  input.value = "";
+  document.getElementById("resultado").value = "";
+  document.getElementById("lista").innerHTML = "";
+  document.getElementById("listaDuplicados").innerHTML = "";
+  document.getElementById("duplicadosContainer").style.display = "none";
+
+  document.getElementById("statPDF").textContent = "0";
+  document.getElementById("statTotal").textContent = "0";
+  document.getElementById("statUnicos").textContent = "0";
+  document.getElementById("statDuplicados").textContent = "0";
+
+  progressWrap.style.display = "none";
+  progressBar.style.width = "0%";
+
+  btnDescargar.disabled = true;
+  statusBox.textContent = "Esperando archivos PDF.";
+}
+
+function normalizar(texto){
+  return texto
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g,"")
+    .replace(/[.,;:]/g,"")
+    .replace(/\s+/g," ")
+    .trim();
+}
+
 function capitalizar(texto){
   return texto.charAt(0).toUpperCase() + texto.slice(1);
 }
@@ -600,179 +863,126 @@ async function descargarInforme(){
   }
 
   const mes = document.getElementById("mesInforme").value;
-  const anio = document.getElementById("anioInforme").value;
+  const anio = document.getElementById("anioInforme").value || "2026";
 
   const {
     Document,
     Packer,
     Paragraph,
     TextRun,
-    HeadingLevel,
     AlignmentType,
-    BorderStyle
+    Header,
+    Footer,
+    PageNumber
   } = docx;
 
-  const tituloAzul = {
-    color:"2F75B5",
-    bold:true,
-    size:28,
-    font:"Calibri"
-  };
+  const runNormal = { font:"Calibri", size:22 };
+  const runItalic = { font:"Calibri", size:22, italics:true };
+  const runTitle = { font:"Calibri", size:28, bold:true, color:"2F75B5" };
+  const runSection = { font:"Calibri", size:24, italics:true, color:"2F75B5" };
+  const runHeader = { font:"Calibri", size:24, bold:true };
 
-  const subtituloAzul = {
-    color:"2F75B5",
-    italics:true,
-    size:24,
-    font:"Calibri"
-  };
+  const p = (text, opts = {}) => new Paragraph({
+    alignment: opts.align || AlignmentType.LEFT,
+    spacing: opts.spacing || { after: 140 },
+    children:[new TextRun({ text, ...(opts.run || runNormal) })]
+  });
 
-  const encabezadoSeccion = (texto) =>
-    new Paragraph({
-      shading:{fill:"D9EAF7"},
-      spacing:{before:280,after:80},
-      children:[
-        new TextRun({
-          text:texto,
-          bold:true,
-          size:24,
-          font:"Calibri"
-        })
-      ]
-    });
+  const tituloSeccion = (text) => new Paragraph({
+    spacing:{ before:280, after:160 },
+    children:[new TextRun({ text, ...runSection })]
+  });
 
-  const textoBase = (fecha, sistema) =>
-    new Paragraph({
-      alignment:AlignmentType.JUSTIFIED,
-      spacing:{after:160},
-      children:[
-        new TextRun({
-          text:`Conforme a la implementación del sistema de referencia llevada a cabo el día ${fecha}, durante el mes de ${mes} de ${anio} se realizaron los siguientes trabajos de soporte y mantenimiento requeridos por el Product Owner del producto:`,
-          italics:true,
-          size:22,
-          font:"Calibri"
-        })
-      ]
-    });
+  const encabezado = (text) => new Paragraph({
+    spacing:{ before:180, after:80 },
+    shading:{ fill:"DDEBF7" },
+    children:[new TextRun({ text, ...runHeader })]
+  });
 
-  const bullet = (texto) =>
-    new Paragraph({
-      bullet:{level:0},
-      spacing:{after:90},
-      children:[
-        new TextRun({
-          text:texto,
-          size:22,
-          font:"Calibri"
-        })
-      ]
-    });
+  const descripcion = (fecha) => new Paragraph({
+    alignment:AlignmentType.JUSTIFIED,
+    spacing:{ after:160 },
+    indent:{ left:420 },
+    children:[
+      new TextRun({
+        text:`Conforme a la implementación del sistema de referencia llevada a cabo el día ${fecha}, durante el mes de ${mes} de ${anio} se realizaron los siguientes trabajos de soporte y mantenimiento requeridos por el Product Owner del producto:`,
+        ...runItalic
+      })
+    ]
+  });
+
+  const bullet = (text) => new Paragraph({
+    bullet:{ level:0 },
+    spacing:{ after:90 },
+    indent:{ left:720 },
+    children:[new TextRun({ text, ...runNormal })]
+  });
 
   const children = [
-    new Paragraph({
-      spacing:{after:450},
-      children:[
-        new TextRun({
-          text:"9   SISTEMAS Y TECNOLOGÍA DE LA INFORMACIÓN",
-          ...tituloAzul
-        })
-      ]
-    }),
+    p("9     SISTEMAS Y TECNOLOGÍA DE LA INFORMACIÓN", { run:runTitle, spacing:{ after:420 } }),
 
-    new Paragraph({
-      spacing:{before:250,after:180},
-      children:[
-        new TextRun({
-          text:"9.1   INFRAESTRUCTURA Y COMUNICACIONES",
-          ...subtituloAzul
-        })
-      ]
-    }),
+    tituloSeccion("9.1     INFRAESTRUCTURA Y COMUNICACIONES"),
 
-    encabezadoSeccion("9.1.1   ACTIVIDADES DE ASISTENCIA TÉCNICA"),
-    textoBase("25-03-2018"),
+    encabezado("9.1.1     ACTIVIDADES DE ASISTENCIA TÉCNICA"),
+    descripcion("25-03-2018"),
     bullet("Asistencia inmediata a PC´s con respecto a conexión de los sistemas."),
     bullet("Revisión y configuración de impresoras en medios no presenciales."),
     bullet("Revisión impresora terminales de autoconsulta."),
 
-    encabezadoSeccion("9.1.2   ACTIVIDADES DE INFRAESTRUCTURA Y COMUNICACIONES"),
-    textoBase("25-03-2018"),
+    encabezado("9.1.2     ACTIVIDADES DE INFRAESTRUCTURA Y COMUNICACIONES"),
+    descripcion("25-03-2018"),
     bullet("Mantenimiento de PC´s de SyC en AMIP y oficinas."),
     bullet("Se realizó mantenimiento a la base de datos."),
     bullet("Se realizó limpieza del espacio en disco para mejorar el rendimiento de las aplicaciones."),
 
-    new Paragraph({
-      spacing:{before:360,after:180},
-      children:[
-        new TextRun({
-          text:"9.2   MANTENIMIENTO DEL SISTEMA TRIBUTARIO",
-          ...subtituloAzul
-        })
-      ]
-    }),
+    tituloSeccion("9.2     MANTENIMIENTO DEL SISTEMA TRIBUTARIO"),
 
-    encabezadoSeccion("9.2.1   TAREAS Y ASISTENCIA INMEDIATA AL SISTEMA TRIBUTARIO"),
-    textoBase("25-03-2018"),
+    encabezado("9.2.1     TAREAS Y ASISTENCIA INMEDIATA AL SISTEMA TRIBUTARIO"),
+    descripcion("25-03-2018"),
     bullet(""),
 
-    new Paragraph({
-      spacing:{before:360,after:180},
-      children:[
-        new TextRun({
-          text:"9.3   TAREAS DE MANTENIMIENTO A SISTEMAS IMPLEMENTADOS",
-          ...subtituloAzul
-        })
-      ]
-    }),
+    tituloSeccion("9.3     TAREAS DE MANTENIMIENTO A SISTEMAS IMPLEMENTADOS"),
 
-    encabezadoSeccion("9.3.1   SISTEMA DE EXPEDIENTES, TRÁMITES Y CONTACTOS"),
-    textoBase("21-12-2016"),
+    encabezado("9.3.1     SISTEMA DE EXPEDIENTES, TRÁMITES Y CONTACTOS"),
+    descripcion("21-12-2016"),
     bullet("Asistencia al usuario."),
     bullet("Creación de alertas en Kontaktar."),
     bullet("Creación de usuarios."),
 
-    encabezadoSeccion("9.3.2   SISTEMA DE GESTIÓN DE TURNOS"),
-    textoBase("20-10-2019"),
+    encabezado("9.3.2     SISTEMA DE GESTIÓN DE TURNOS"),
+    descripcion("20-10-2019"),
     bullet("Mantenimiento de Turnero."),
     bullet("Asistencia periódica por usuarios bloqueados."),
     bullet("Creación de nuevos usuarios."),
     bullet("Blanqueos de clave."),
 
-    encabezadoSeccion("9.3.3   SISTEMA WEB, DEUDA ONLINE Y PAGOS"),
-    textoBase("01-10-2019"),
+    encabezado("9.3.3     SISTEMA WEB, DEUDA ONLINE Y PAGOS"),
+    descripcion("01-10-2019"),
     bullet("Corrección de pagos imputados con error."),
     bullet("Listados gerenciales."),
 
-    encabezadoSeccion("9.3.4   SISTEMA DE CARGA DE DDJJ WEB"),
-    textoBase("01-02-2020"),
+    encabezado("9.3.4     SISTEMA DE CARGA DE DDJJ WEB"),
+    descripcion("01-02-2020"),
     bullet("Asistencia al usuario."),
 
-    encabezadoSeccion("9.3.5   DÉBITOS AUTOMÁTICOS WEB"),
-    textoBase("01-04-2020"),
+    encabezado("9.3.5     DÉBITOS AUTOMÁTICOS WEB"),
+    descripcion("01-04-2020"),
     bullet(""),
 
-    encabezadoSeccion("9.3.6   BOLETA DIGITAL"),
-    textoBase("01-06-2022"),
+    encabezado("9.3.6     BOLETA DIGITAL"),
+    descripcion("01-06-2022"),
     bullet("Mantenimiento de los procesos de Boleta Digital."),
 
-    encabezadoSeccion("9.3.7   WEB AMIP"),
-    textoBase("01-09-2022"),
+    encabezado("9.3.7     WEB AMIP"),
+    descripcion("01-09-2022"),
     bullet("Mantenimiento de los procesos de WEB AMIP."),
     bullet("Actualización de banners."),
 
-    encabezadoSeccion("9.3.8   CERTIFICADO FISCAL WEB"),
-    textoBase("04-12-2023"),
+    encabezado("9.3.8     CERTIFICADO FISCAL WEB"),
+    descripcion("04-12-2023"),
     bullet("Mantenimiento de los procesos de CERTIFICADO FISCAL WEB."),
 
-    new Paragraph({
-      spacing:{before:420,after:180},
-      children:[
-        new TextRun({
-          text:"9.4   TAREAS Y ASISTENCIA INMEDIATA A SISTEMAS IMPLEMENTADOS",
-          ...subtituloAzul
-        })
-      ]
-    }),
-
+    tituloSeccion("9.4     TAREAS Y ASISTENCIA INMEDIATA A SISTEMAS IMPLEMENTADOS"),
     bullet("Asistencia al usuario telefónicamente."),
     bullet("Análisis de casos de error o nuevas implementaciones."),
     bullet("Generación de listados de Excel a quien lo solicite."),
@@ -790,24 +1000,33 @@ async function descargarInforme(){
     styles:{
       default:{
         document:{
-          run:{
-            font:"Calibri",
-            size:22
-          },
-          paragraph:{
-            spacing:{line:276}
-          }
+          run:{ font:"Calibri", size:22 },
+          paragraph:{ spacing:{ line:276 } }
         }
       }
+    },
+    numbering:{
+      config:[{
+        reference:"bullet-default",
+        levels:[{
+          level:0,
+          format:"bullet",
+          text:"•",
+          alignment:AlignmentType.LEFT,
+          style:{
+            paragraph:{ indent:{ left:720, hanging:360 } }
+          }
+        }]
+      }]
     },
     sections:[{
       properties:{
         page:{
           margin:{
-            top:1000,
-            right:1000,
-            bottom:1000,
-            left:1000
+            top:850,
+            right:850,
+            bottom:850,
+            left:850
           }
         }
       },
@@ -816,11 +1035,14 @@ async function descargarInforme(){
   });
 
   const blob = await Packer.toBlob(doc);
+  const url = URL.createObjectURL(blob);
 
   const link = document.createElement("a");
-  link.href = URL.createObjectURL(blob);
+  link.href = url;
   link.download = `Informe de Avances ${capitalizar(mes)} ${anio}.docx`;
   link.click();
+
+  URL.revokeObjectURL(url);
 }
 </script>
 
